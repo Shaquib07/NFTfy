@@ -1,20 +1,16 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type { Metadata } from "next"
+import "./globals.css"
 
 export const metadata: Metadata = {
-  title: 'NFT-fy',
-  description: 'Created with next',
-  generator: 'SHAQUIB',
+  title: "NFT-fy",
+  description: "NFT marketplace built with Next.js",
+  generator: "SHAQUIB",
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   )
 }
