@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +26,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+
 import {
   ChevronDown,
   LayoutDashboard,
@@ -42,28 +44,41 @@ interface AdminDashboardLayoutProps {
   children: React.ReactNode
 }
 
+interface User {
+  email?: string
+  role?: string
+}
+
 export default function AdminDashboardLayout({ children }: AdminDashboardLayoutProps) {
   const router = useRouter()
-  const [user, setUser] = useState<{ email?: string; role?: string } | null>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem("user")
-    if (userData) {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
+    const checkUser = () => {
+      try {
+        const userData = localStorage.getItem("user")
+        if (userData) {
+          const parsedUser = JSON.parse(userData)
+          setUser(parsedUser)
 
-      if (parsedUser.role !== "admin") {
-        router.push("/dashboard/startup")
+          if (parsedUser.role !== "admin") {
+            router.replace("/dashboard/startup")
+          }
+        } else {
+          router.replace("/login")
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error)
+        router.replace("/login")
       }
-    } else {
-      router.push("/login")
     }
+
+    checkUser()
   }, [router])
 
   const handleLogout = () => {
     localStorage.removeItem("user")
-    router.push("/login")
+    router.replace("/login")
   }
 
   if (!user) {
@@ -82,6 +97,7 @@ export default function AdminDashboardLayout({ children }: AdminDashboardLayoutP
               <span className="font-bold text-lg">NFTfy Admin</span>
             </div>
           </SidebarHeader>
+
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -134,13 +150,14 @@ export default function AdminDashboardLayout({ children }: AdminDashboardLayoutP
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
+
           <SidebarFooter className="p-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="w-full justify-start px-2 text-white hover:bg-gray-700">
                   <Avatar className="h-7 w-7 mr-2">
                     <AvatarImage src="/stylized-admin-icon.png" alt="Avatar" />
-                    <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>{user?.email?.charAt(0).toUpperCase() ?? "A"}</AvatarFallback>
                   </Avatar>
                   <span className="truncate">{user.email}</span>
                   <ChevronDown className="h-4 w-4 ml-auto" />
@@ -177,7 +194,8 @@ export default function AdminDashboardLayout({ children }: AdminDashboardLayoutP
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
+
+          <main className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>
